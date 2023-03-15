@@ -1,9 +1,11 @@
 [package]
-name = "fix_sbc"
+name = "mini_sbc"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Bluetooth audio SBC decoder"
+keywords = ["audio", "SBC", "decode"]
+repository = "https://github.com/823984418/mini_sbc"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 
