@@ -1,3 +1,5 @@
+extern crate core;
+
 pub mod crc;
 pub mod filter_state;
 pub mod frame_decoder;
