@@ -55,7 +55,7 @@ impl ValidSubbands for Subbands<4> {
 
         let mut sum = [0_i32; 4];
         let mut f = 0;
-        let mut p = |i| {
+        for i in (0..step as usize + 1).rev() {
             if (f & 1) == 0 {
                 sum[0] += v[0][i] * M_PRORO_4[f][0];
                 sum[1] += v[1][i] * M_PRORO_4[f][1];
@@ -68,12 +68,20 @@ impl ValidSubbands for Subbands<4> {
                 sum[3] += v[2][i] * M_PRORO_4[f][3];
             };
             f += 1;
-        };
-        for s in (0..step as usize + 1).rev() {
-            p(s);
         }
-        for s in (step as usize + 1..FILTER_ORDER).rev() {
-            p(s);
+        for i in (step as usize + 1..FILTER_ORDER).rev() {
+            if (f & 1) == 0 {
+                sum[0] += v[0][i] * M_PRORO_4[f][0];
+                sum[1] += v[1][i] * M_PRORO_4[f][1];
+                sum[2] += 0 * M_PRORO_4[f][2];
+                sum[3] -= v[1][i] * M_PRORO_4[f][3];
+            } else {
+                sum[0] -= v[0][i] * M_PRORO_4[f][0];
+                sum[1] += v[2][i] * M_PRORO_4[f][1];
+                sum[2] += v[3][i] * M_PRORO_4[f][2];
+                sum[3] += v[2][i] * M_PRORO_4[f][3];
+            };
+            f += 1;
         }
         for sb in 0..4 {
             o[sb] = helper::saturating_i16(sum[sb] >> 15);
@@ -135,7 +143,7 @@ impl ValidSubbands for Subbands<8> {
 
         let mut sum = [0_i32; 8];
         let mut f = 0;
-        let mut p = |i| {
+        for i in (0..step as usize + 1).rev() {
             if (f & 1) == 0 {
                 sum[0] += v[0][i] * M_PRORO_8[f][0];
                 sum[1] += v[1][i] * M_PRORO_8[f][1];
@@ -156,12 +164,28 @@ impl ValidSubbands for Subbands<8> {
                 sum[7] += v[4][i] * M_PRORO_8[f][7];
             };
             f += 1;
-        };
-        for s in (0..step as usize + 1).rev() {
-            p(s);
         }
-        for s in (step as usize + 1..FILTER_ORDER).rev() {
-            p(s);
+        for i in (step as usize + 1..FILTER_ORDER).rev() {
+            if (f & 1) == 0 {
+                sum[0] += v[0][i] * M_PRORO_8[f][0];
+                sum[1] += v[1][i] * M_PRORO_8[f][1];
+                sum[2] += v[2][i] * M_PRORO_8[f][2];
+                sum[3] += v[3][i] * M_PRORO_8[f][3];
+                sum[4] += 0 * M_PRORO_8[f][4];
+                sum[5] -= v[3][i] * M_PRORO_8[f][5];
+                sum[6] -= v[2][i] * M_PRORO_8[f][6];
+                sum[7] -= v[1][i] * M_PRORO_8[f][7];
+            } else {
+                sum[0] -= v[0][i] * M_PRORO_8[f][0];
+                sum[1] += v[4][i] * M_PRORO_8[f][1];
+                sum[2] += v[5][i] * M_PRORO_8[f][2];
+                sum[3] += v[6][i] * M_PRORO_8[f][3];
+                sum[4] += v[7][i] * M_PRORO_8[f][4];
+                sum[5] += v[6][i] * M_PRORO_8[f][5];
+                sum[6] += v[5][i] * M_PRORO_8[f][6];
+                sum[7] += v[4][i] * M_PRORO_8[f][7];
+            };
+            f += 1;
         }
         for sb in 0..8 {
             o[sb] = helper::saturating_i16(sum[sb] >> 15);
