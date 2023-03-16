@@ -1,9 +1,10 @@
 use crate::crc::crc8;
 use crate::filter_state::FilterState;
-use crate::header::{Blocks, ChannelMode, MSBC_BLOCKS, SBCHeader};
+use crate::header::{Blocks, ChannelMode, SBCHeader, MSBC_BLOCKS};
 use crate::io::{BitInput, ByteError, ByteInput};
-use crate::sbc;
 use crate::sbc::{Channels, Subbands, ValidChannels, ValidSubbands};
+use crate::{const_for, sbc};
+use crunchy::unroll;
 
 const SBCDEC_FIXED_EXTRA_BITS: u8 = 2;
 
@@ -136,8 +137,20 @@ where
                 let shift = self.scale_factor[ch][sb] + 1 + SBCDEC_FIXED_EXTRA_BITS;
                 let s = self.buffer.read_u16(bits as usize)? as i32;
 
-                sample[ch][sb] =
-                    ((((s as i64) << 1 | 1) << shift) / ((1 << bits) - 1) - (1 << shift)) as i32;
+                #[inline(always)]
+                fn div_level(v: i32, bits: u8) -> i32 {
+                    const LEVELS: [i32; 16] = {
+                        let mut x = [0; 16];
+                        const_for!(i in (0, 16) {
+                            x[i] = (1 << i) - 1;
+                        });
+                        x
+                    };
+                    v / LEVELS[bits as usize]
+                }
+
+                sample[ch][sb] = div_level((((s as i32) << 1 | 1) << shift), bits) - (1 << shift); 
+                // sample[ch][sb] = (((s << 1 | 1) << (shift - bits)) - (1 << shift));
             }
         }
         if CHANNELS == 2 && self.joint != 0 {
