@@ -3,6 +3,7 @@ use crate::helper;
 use crate::table::{
     M_0_195, M_0_382, M_0_555, M_0_707, M_0_831, M_0_923, M_0_980, M_1_000, M_PRORO_4, M_PRORO_8,
 };
+use crunchy::unroll;
 
 pub const FILTER_ORDER: usize = 10;
 
@@ -56,22 +57,24 @@ impl ValidSubbands for Subbands<4> {
         let mut sum = [0_i32; 4];
 
         let mut i = step;
-        for f in 0..FILTER_ORDER {
-            if (f & 1) == 0 {
-                sum[0] += v[0][i] * M_PRORO_4[f][0];
-                sum[1] += v[1][i] * M_PRORO_4[f][1];
-                sum[2] += 0 * M_PRORO_4[f][2];
-                sum[3] -= v[1][i] * M_PRORO_4[f][3];
-            } else {
-                sum[0] -= v[0][i] * M_PRORO_4[f][0];
-                sum[1] += v[2][i] * M_PRORO_4[f][1];
-                sum[2] += v[3][i] * M_PRORO_4[f][2];
-                sum[3] += v[2][i] * M_PRORO_4[f][3];
-            };
-            if i == 0 {
-                i = FILTER_ORDER - 1;
-            } else {
-                i -= 1;
+        unroll! {
+            for f in 0..10 { // FILTER_ORDER
+                if (f & 1) == 0 {
+                    sum[0] += v[0][i] * M_PRORO_4[f][0];
+                    sum[1] += v[1][i] * M_PRORO_4[f][1];
+                    sum[2] += 0 * M_PRORO_4[f][2];
+                    sum[3] -= v[1][i] * M_PRORO_4[f][3];
+                } else {
+                    sum[0] -= v[0][i] * M_PRORO_4[f][0];
+                    sum[1] += v[2][i] * M_PRORO_4[f][1];
+                    sum[2] += v[3][i] * M_PRORO_4[f][2];
+                    sum[3] += v[2][i] * M_PRORO_4[f][3];
+                };
+                if i == 0 {
+                    i = FILTER_ORDER - 1;
+                } else {
+                    i -= 1;
+                }
             }
         }
         for sb in 0..4 {
@@ -135,30 +138,33 @@ impl ValidSubbands for Subbands<8> {
         let mut sum = [0_i32; 8];
         let mut f = 0;
         let mut i = step;
-        for f in 0..FILTER_ORDER {
-            if (f & 1) == 0 {
-                sum[0] += v[0][i] * M_PRORO_8[f][0];
-                sum[1] += v[1][i] * M_PRORO_8[f][1];
-                sum[2] += v[2][i] * M_PRORO_8[f][2];
-                sum[3] += v[3][i] * M_PRORO_8[f][3];
-                sum[4] += 0 * M_PRORO_8[f][4];
-                sum[5] -= v[3][i] * M_PRORO_8[f][5];
-                sum[6] -= v[2][i] * M_PRORO_8[f][6];
-                sum[7] -= v[1][i] * M_PRORO_8[f][7];
-            } else {
-                sum[0] -= v[0][i] * M_PRORO_8[f][0];
-                sum[1] += v[4][i] * M_PRORO_8[f][1];
-                sum[2] += v[5][i] * M_PRORO_8[f][2];
-                sum[3] += v[6][i] * M_PRORO_8[f][3];
-                sum[4] += v[7][i] * M_PRORO_8[f][4];
-                sum[5] += v[6][i] * M_PRORO_8[f][5];
-                sum[6] += v[5][i] * M_PRORO_8[f][6];
-                sum[7] += v[4][i] * M_PRORO_8[f][7];
-            };
-            if i == 0 {
-                i = FILTER_ORDER - 1;
-            }else{
-                i -= 1;
+
+        unroll! {
+            for f in 0..10 { // FILTER_ORDER
+                if (f & 1) == 0 {
+                    sum[0] += v[0][i] * M_PRORO_8[f][0];
+                    sum[1] += v[1][i] * M_PRORO_8[f][1];
+                    sum[2] += v[2][i] * M_PRORO_8[f][2];
+                    sum[3] += v[3][i] * M_PRORO_8[f][3];
+                    sum[4] += 0 * M_PRORO_8[f][4];
+                    sum[5] -= v[3][i] * M_PRORO_8[f][5];
+                    sum[6] -= v[2][i] * M_PRORO_8[f][6];
+                    sum[7] -= v[1][i] * M_PRORO_8[f][7];
+                } else {
+                    sum[0] -= v[0][i] * M_PRORO_8[f][0];
+                    sum[1] += v[4][i] * M_PRORO_8[f][1];
+                    sum[2] += v[5][i] * M_PRORO_8[f][2];
+                    sum[3] += v[6][i] * M_PRORO_8[f][3];
+                    sum[4] += v[7][i] * M_PRORO_8[f][4];
+                    sum[5] += v[6][i] * M_PRORO_8[f][5];
+                    sum[6] += v[5][i] * M_PRORO_8[f][6];
+                    sum[7] += v[4][i] * M_PRORO_8[f][7];
+                };
+                if i == 0 {
+                    i = FILTER_ORDER - 1;
+                } else {
+                    i -= 1;
+                }
             }
         }
         for sb in 0..8 {
