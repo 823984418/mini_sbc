@@ -1,6 +1,6 @@
 [package]
 name = "mini_sbc"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 description = "Bluetooth audio SBC decoder"
 keywords = ["audio", "SBC", "decode"]

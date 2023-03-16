@@ -49,6 +49,15 @@ const M_COS_N_PI_D16: [i32; 9] = {
     v
 };
 
+#[test]
+fn show_m_cos_n_pi_d16() {
+    for i in 0..9 {
+        let v = M_COS_N_PI_D16[i];
+        print!("{:#010X}, ", v);
+        println!("{:#010X}, ", -v);
+    }
+}
+
 pub(crate) const M_1_000: i32 = M_COS_N_PI_D16[0];
 pub(crate) const M_0_980: i32 = M_COS_N_PI_D16[1];
 pub(crate) const M_0_923: i32 = M_COS_N_PI_D16[2];
